@@ -20,7 +20,7 @@ This work was (or will be) presented at the following conferences:
 
 - **Bagchi, D.**, and Boyles, S. D. (2024, October). *Error Bounds for Stochastic User Equilibrium Traffic Assignment.* *In* _Institute for Operations Research and the Management Sciences (INFORMS) Annual Meeting 2024_, Seattle, USA. (TSL Invited session)
 
-The full MS thesis will by May 30th, 2025. 
+The full MS thesis will by available May 30th, 2025. 
 
 ---
 
