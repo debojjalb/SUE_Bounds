@@ -83,4 +83,4 @@ Tested with Python 3.12.5
 ## Contact
 
 For questions, collaborations, or further discussions, feel free to reach out.
-I am availabale at debojjalb@utexas.edu
+I am availabale at debojjalb@utexas.edu or https://debojjalb.github.io
