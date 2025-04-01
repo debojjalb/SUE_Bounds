@@ -1,0 +1,8 @@
+numpy
+scipy
+matplotlib
+sympy # Not required unless testing proofs in derivationChecks folder
+pandas
+tqdm 
+pickle
+networkx

@@ -1,0 +1,11 @@
+<NUMBER OF ZONES> 2										
+<NUMBER OF NODES> 2										
+<FIRST THRU NODE> 1										
+<NUMBER OF LINKS> 2
+<ORIGINAL HEADER>~ 	Tail	Head	Capacity (veh/h)	Length (ft)	Free Flow Time (min)	B	Power	Speed (ft/min) 	Toll 	Type	;
+<END OF METADATA>											
+
+
+~	init_node	term_node	capacity	length	free_flow_time	b	power	speed	toll	link_type	;
+1	        2	        1.0	        1.0	    0.0	            1.0	1.0	    0.0	        0.0	    1;
+2	        1	        1.0	        1.0	    1.0	            0.0	1.0	    0.0	        0.0	    1;
