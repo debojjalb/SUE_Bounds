@@ -1,8 +1,11 @@
 # Error Bounds for Stochastic User Equilibrium Traffic Assignment
 
 This repository contains the implementation of my MS thesis:  
+
 **"Error Bounds for Stochastic User Equilibrium Traffic Assignment"**  
+
 **Author:** Debojjal Bagchi, The University of Texas at Austin  
+
 **Supervising Committee:**  
 - Dr. Stephen D. Boyles, Supervisor (@sboyles)
 - Dr. Zhaomiao Guo, Reader
