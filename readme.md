@@ -62,9 +62,7 @@ To skip bound computation, disable it using the `calBound` flag in `main.py`.
 
 - **All plots** are saved under the `Plots/` directory.  
 - **Thesis figures** are available in `Plots/paperPlots/`, all generated from a single  main.py  run.  
-- **Input networks** are stored in `testNetworks/`. *(Please fix citation source)*  
 - **Reference optimal solutions** (for convergence gap of 1) are saved in `optimalSolutions/`.  
-- **Proofs and derivation verifications** are in `derivationChecks/`, implemented using symbolic solvers (e.g., SymPy).  
 
 ---
 
