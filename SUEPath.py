@@ -355,7 +355,7 @@ class StochasticUE:
             self.updateGap()
 
             # If testing bound accuracy
-            self.testBounds()
+            # self.testBounds()
 
             prev_gap.append(self.gap)
 
@@ -468,11 +468,12 @@ class StochasticUE:
             self.lambdaMaxOverIts[OD].append(bound_lambda)
 
             # To check the tightness of the bound
-            h_i = self.currentPathFlowsOverIts[OD][-1]
-            h_next = self.targetFlowOverIts[OD][-1]
-            h_star = optimalSol[OD]
 
             if optimalSol is not None:
+                h_i = self.currentPathFlowsOverIts[OD][-1]
+                h_next = self.targetFlowOverIts[OD][-1]
+                h_star = optimalSol[OD]
+
                 bound_val = (abs(bound_lambda) * norm(np.array(list(dict_difference(h_next, h_i).values()))))
                 actual_val = (norm(np.array(list(dict_difference(h_star, h_i).values()))))
                 looseness += abs(bound_val - actual_val)
@@ -522,6 +523,7 @@ class StochasticUE:
     def linkBound(self):
         """
         calculates the total travel time bound
+        This find M such that ||x - x*||_2 <= M 
         """
         linkbound = 0
         for OD in self.tripSet:
@@ -534,23 +536,48 @@ class StochasticUE:
     def ttbound(self):
         """
         calculates the total travel time bound
+        This finds M such that ||t(x) - t(x*)||_2 <= M
+        where t(x) is the total travel time and t(x*) is the optimal travel time
         """
         ttbound = self.linkLipscitz * self.linkBoundOverIts[-1]
         self.ttboundsOverIts.append(ttbound)
-            
+
     def tsttBound(self):
         """
-        calculates the total system travel time bounds
+        Calculates the total system travel time (TSTT) bound using:
+        ||x t^T - x* t*^T|| <= M * ||t|| + N * ||x|| + M * N
+        where:
+            M = ||x - x*|| = self.linkBoundOverIts[-1]
+            N = ||t(x) - t(x*)|| = self.ttboundsOverIts[-1]
         """
-        m_1 = self.linkBoundOverIts[-1]
-        m_2 = self.ttboundsOverIts[-1]
+        M = self.linkBoundOverIts[-1]     # ||x - x*||
+        N = self.ttboundsOverIts[-1]      # ||t(x) - t(x*)||
 
-        mod_x = dict_norm(self.linkFlows)
-        mod_tx = dict_norm(self.linkCosts)
+        x_norm = dict_norm(self.linkFlows)  # ||x||
+        t_norm = dict_norm(self.linkCosts)  # ||t(x)||
 
-        tsttbound = (m_1 + mod_x) * (m_2 + mod_tx) - self.tstt
+        bound = M * t_norm + N * x_norm + M * N
+        self.tsttBoundOverIts.append(bound)
 
-        self.tsttBoundOverIts.append(tsttbound)
+
+            
+    # def tsttBound(self):
+    #     """
+    #     calculates the total system travel time bounds
+    #     This finds M such that ||tstt(x) - tstt(x*)||_2 <= M
+    #     where tstt(x) is the total system travel time and tstt(x*) is the optimal total system travel time
+    #     tstt(x) = x * t(x)
+    #     """
+
+    #     m_1 = self.linkBoundOverIts[-1]
+    #     m_2 = self.ttboundsOverIts[-1]
+
+    #     mod_x = dict_norm(self.linkFlows)
+    #     mod_tx = dict_norm(self.linkCosts)
+
+    #     tsttbound = (m_1 + mod_x) * (m_2 + mod_tx) - self.tstt
+
+    #     self.tsttBoundOverIts.append(tsttbound)
 
 
 

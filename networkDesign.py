@@ -6,9 +6,9 @@ from helper import convert_network_tntp_to_dat, convert_demand_tntp_to_dat
 import time
 import pandas as pd
 
-USE_BOUNDS = True # Set to True to use bounds on the optimal link costs, otherwise False to use the optimal solution directly
-OPTIMAL_SOL_ACCURACY = 1
-BOUND_ACCURACY = 100
+USE_BOUNDS = False # Set to True to use bounds on the optimal link costs, otherwise False to use the optimal solution directly
+OPTIMAL_SOL_ACCURACY = 0.001
+BOUND_ACCURACY = 0.001
 R = 0.3
 
 input_location_list = ["testNetworks/Sioux Falls Network/", "testNetworks/EMA Network/", "testNetworks/Berlin MC Network/", "testNetworks/Anaheim Network/"]
@@ -38,22 +38,26 @@ def runSUE(accuracy, calBounds):
     optimalLinkCosts = stochasticUE.optimalLinkCost
     norm_optimalLinkCosts = norm(np.array(list(optimalLinkCosts.values())))
 
+    optimalTSTT = stochasticUE.optimalTSTT
+
     # bound on the optimal link costs
     if calBounds:
         bounds_on_link_cost = stochasticUE.ttboundsOverIts[-1]
+        bounds_on_tstt = stochasticUE.tsttBoundOverIts[-1]
     else:
-        bounds_on_link_cost = 0 # No upper bound if solution is optimal
+        bounds_on_link_cost = 0 # No upper bound if not calculating bounds
+        bounds_on_tstt = 0 # No upper bound if not calculating bounds
     
-    return norm_optimalLinkCosts, bounds_on_link_cost
+    return norm_optimalLinkCosts, bounds_on_link_cost, optimalTSTT, bounds_on_tstt
 
 
 print("Network:", networkName)
 
 best_link_to_toll = None
-best_norm_link_cost = 10000000000000
+best_TSTT = 10000000000000
 start_time = time.time()
 
-df = pd.DataFrame(columns = ['Link to toll', 'Norm of optimal link costs', 'Estimaed eqm. norm using bounds', 'Time taken so far'])
+df = pd.DataFrame(columns = ['Link to toll', 'TSTT', 'Bound on TSTT', 'Estimaed eqm. TSTT using bounds', 'Time taken so far'])
 for link_to_toll in network.linkSet:
     print("Link to toll:", link_to_toll)
     # impose toll
@@ -61,43 +65,44 @@ for link_to_toll in network.linkSet:
 
     # run SUE
     if USE_BOUNDS == False:
-        norm_optimalLinkCosts, bounds_on_link_cost = runSUE(accuracy = OPTIMAL_SOL_ACCURACY, calBounds = False)
-        print("Norm of optimal link costs:", norm_optimalLinkCosts)
-        print("Bounds on link cost:", bounds_on_link_cost)
-        if norm_optimalLinkCosts < best_norm_link_cost:
-            best_norm_link_cost = norm_optimalLinkCosts
+        _, _, optimal_TSTT, bounds_on_tstt = runSUE(accuracy = OPTIMAL_SOL_ACCURACY, calBounds = False)
+        print("TSTT:", optimal_TSTT)
+        print("Bounds on TSTT:", bounds_on_tstt)
+        if optimal_TSTT < best_TSTT:
+            best_TSTT = optimal_TSTT
             best_link_to_toll = link_to_toll
     else:
-        norm_optimalLinkCosts, bounds_on_link_cost = runSUE(accuracy = BOUND_ACCURACY, calBounds = True)
-        print("Norm of optimal link costs:", norm_optimalLinkCosts)
-        print("Bounds on link cost:", bounds_on_link_cost)
-        if norm_optimalLinkCosts + bounds_on_link_cost < best_norm_link_cost:
-            best_norm_link_cost = norm_optimalLinkCosts + bounds_on_link_cost
+        _, _,  optimal_TSTT, bounds_on_tstt = runSUE(accuracy = BOUND_ACCURACY, calBounds = True)
+        print("TSTT:", optimal_TSTT)
+        print("Bounds on TSTT:", bounds_on_tstt)
+        if optimal_TSTT + bounds_on_tstt < best_TSTT:
+            best_TSTT = optimal_TSTT + bounds_on_tstt 
             best_link_to_toll = link_to_toll
 
     # release toll
     network.linkSet[link_to_toll].tollInTime = 0.0
     new_row = pd.DataFrame([{
         'Link to toll': link_to_toll,
-        'Norm of optimal link costs': norm_optimalLinkCosts,
-        'Estimaed eqm. norm using bounds': norm_optimalLinkCosts + bounds_on_link_cost,
+        'TSTT': optimal_TSTT,
+        'Bound on TSTT': bounds_on_tstt,
+        'Estimaed eqm. TSTT using bounds': optimal_TSTT + bounds_on_tstt,
         'Time taken so far': round(time.time() - start_time, 2)
     }])
 
     # Append using concat
     df = pd.concat([df, new_row], ignore_index=True)
-    # df.to_csv(f'netDesRes/results_{USE_BOUNDS}_{networkName}.csv')
+    df.to_csv(f'netDesRes/TSTT_results_{USE_BOUNDS}_{networkName}_{BOUND_ACCURACY}.csv')
 
     print("\n\n")
     print("Results so far:")
     print("Best link to toll:", best_link_to_toll)
-    print("Best norm link cost:", best_norm_link_cost)
+    print("Best TSTT:", best_TSTT)
     print("Time taken so far:", round(time.time() - start_time, 2), " seconds")
     print("\n\n")
 
 # Print the least 5 link to tolls
 print("Least 5 link to tolls:")
-print(df.sort_values(by=['Estimaed eqm. norm using bounds']).head(5))
+print(df.sort_values(by=['Estimaed eqm. TSTT using bounds']).head(5))
 print("\n\n")
 
 
