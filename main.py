@@ -4,7 +4,7 @@ from genPlots import *
 import pickle
 from helper import convert_network_tntp_to_dat, convert_demand_tntp_to_dat
 
-def run(inputLocation, plot, calBounds, k=10, theta=0.5, r=0.4, debug = False):
+def run(inputLocation, plot, calBounds, k=10, theta=0.5, r=0.5, debug = False):
     """
     Runs the traffic assignment for a given network location and checks the bounds on each feasible solution.
     :param inputLocation: str, path to the network files
@@ -32,10 +32,10 @@ def run(inputLocation, plot, calBounds, k=10, theta=0.5, r=0.4, debug = False):
     network.readDemand(inputLocation)
     initType = 'logitFreeFlow'
 
-    optSolAccuracy = 1
+    optSolAccuracy = 0.01
     optSolMaxIter = 100000
 
-    boundAccuracy = 10
+    boundAccuracy = 1
     boundMaxIter = 100000
 
     if __name__ == "__main__":
@@ -49,12 +49,12 @@ def run(inputLocation, plot, calBounds, k=10, theta=0.5, r=0.4, debug = False):
                 ooptimalLinkCost = pickle.load(f)
             with open(f'./optimalSolutions/{networkName}_optimalTSTT_{theta}_{k}_{optSolAccuracy}.pkl', 'rb') as f:
                 optimalTSTT = pickle.load(f)
+            print('Optimal solution loaded successfully from pickle\n\n')
             
         except Exception as e:
-            print(f'\n\nOptimal solution pickle not found. Running the assignmen {e}t')
+            print(f'\n\nOptimal solution pickle not found. Running the assignment\n\n')
             stochasticUE = StochasticUE(network, theta, debug, k, r)
-            optimalSol = stochasticUE.targetFlowOverIts 
-            stochasticUE.assignment(accuracy=optSolAccuracy, maxIter=optSolMaxIter, initType=initType, calBounds = calBounds, networkName=networkName)
+            stochasticUE.assignment(accuracy=optSolAccuracy, maxIter=optSolMaxIter, initType=initType, calBounds = False, networkName=networkName)
             optimalSol = stochasticUE.optimalSol 
             optimalLinkFlows = stochasticUE.optimalLinkFlows
             ooptimalLinkCost = stochasticUE.optimalLinkCost
@@ -70,7 +70,7 @@ def run(inputLocation, plot, calBounds, k=10, theta=0.5, r=0.4, debug = False):
 
         print("Generating Bound")
         stochasticUE = StochasticUE(network, theta, debug, k, r, optimalSol)
-        stochasticUE.assignment(accuracy=boundAccuracy, maxIter=boundMaxIter, initType=initType, calBounds = True, networkName=networkName)
+        stochasticUE.assignment(accuracy=boundAccuracy, maxIter=boundMaxIter, initType=initType, calBounds = calBounds, networkName=networkName)
 
         if plot:
             print("Generating Plots")
@@ -81,4 +81,4 @@ if __name__ == "__main__":
     input_location_list = ["testNetworks/Sioux Falls Network/", "testNetworks/Berlin MC Network/", "testNetworks/EMA Network/", "testNetworks/Anaheim Network/"]
     # input_location_list = ["testNetworks/Sioux Falls Network/"]
     for inputLocation in input_location_list:
-        run(inputLocation, plot = True, calBounds = True)
+        run(inputLocation, plot = False, calBounds = True)

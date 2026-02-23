@@ -88,6 +88,10 @@ class StochasticUE:
 
         self.df = pd.DataFrame(columns=["iteration", "origin", "destination", "path", "current flow", "target flow", "cost", "logit probs"])
         
+        # for testing bound accuracy
+        self.iterationBoundTest = []
+        self.bound_gap = 100000000
+
         # For timing
         self.timers = {
             "updatePathCosts": 0,
@@ -321,6 +325,23 @@ class StochasticUE:
                     gap += abs(self.currentPathFlows[orgn, dest][str(path)] - self.targetPathFlows[orgn, dest][str(path)])
         self.gap = gap
 
+        # if len(self.currentFlowOverIts) < 2:
+        #     self.gap = 10000000
+        #     return
+
+        # x_new = self.currentFlowOverIts[-1]   # x^{n+1}
+        # x_old = self.currentFlowOverIts[-2]   # x^{n}
+
+        # max_rel = 0.0
+        # for l in self.linkSet:
+        #     old = x_old[l]
+        #     new = x_new[l]
+        #     if old != 0.0:
+        #         rel = abs(new - old) / old
+        #         if rel > max_rel:
+        #             max_rel = rel
+        # self.gap = max_rel
+
     def assignment(self, accuracy, maxIter, initType, calBounds, networkName):
         """
         Performs the Stochastic User Equilibrium assignment algorithm.
@@ -354,28 +375,34 @@ class StochasticUE:
             self.updateTargetPathFlows()
             self.updateGap()
 
-            # If testing bound accuracy
-            # self.testBounds()
-
             prev_gap.append(self.gap)
 
-            print(f"Current gap: {self.gap} and time elapsed: {time.time() - start_time}")
+            print(f"Current gap: {self.gap}, iteration: {it}, and time elapsed: {time.time() - start_time}")
             self.optimalSol = self.currentPathFlows
             self.optimalLinkFlows = self.linkFlows
             self.optimalLinkCost = self.linkCosts
             self.optimalTSTT = self.tstt
 
-            if calBounds and it >= 1:
+            if it >= 1:
                 self.updateLogs()
+
+            if calBounds and it >= 1:
                 self.boundMatrix()
                 self.linkBound()
                 self.ttbound()
                 self.tsttBound()
 
+            # If testing bound accuracy
+            if calBounds:
+                self.testBounds()
+
             if self.gap < accuracy:
+                print("\n\nDONE! Desired accuracy achieved.")
                 print("Assignment took", time.time() - startP, " seconds")
                 print("Assignment converged in ", it, " iterations")
                 converged = True
+                if calBounds:
+                    self.finalBoundResults(networkName) # print the bound results for each iteration
                 break
 
             # if time.time() - startP > 60*10:
@@ -418,8 +445,10 @@ class StochasticUE:
         for j in range(n):
             for i in range(j):
                 J[i, j] = self.theta * p[i] * p[j]
+                J[j, i] = self.theta * p[i] * p[j]
             J[j, j] = - self.theta * p[j] * (1 - p[j])
         return J
+
        
     def netJacobian(self, OD):
         jacobian_matrix = np.zeros((len(self.allPathsODCache[OD]), len(self.allPathsODCache[OD])))
@@ -431,13 +460,19 @@ class StochasticUE:
                     sum_ += self.linkCostDerivatives[link]
                 jacobian_matrix[self.allPathsODCache[OD].index(path_i)][self.allPathsODCache[OD].index(path_j)] = sum_
         return jacobian_matrix
-        
+
+    
     def targetJacobian(self, OD):
         d = self.tripSet[OD].demand
         costJacobian = self.netJacobian(OD)
-        probJacobian = self.logitJacobian(list(self.logitProbablities[OD].values()))
+        
+        paths = self.allPathsODCache[OD]
+        ordered_p = [self.logitProbablities[OD][str(path)] for path in paths]
+        probJacobian = self.logitJacobian(ordered_p)
+        
         hStarJacobian = d * probJacobian 
         targetJacobian = hStarJacobian @ costJacobian
+        
         return targetJacobian
     
     def boundMatrix(self):
@@ -468,15 +503,22 @@ class StochasticUE:
             self.lambdaMaxOverIts[OD].append(bound_lambda)
 
             # To check the tightness of the bound
-
+            # To check the tightness of the bound
             if optimalSol is not None:
                 h_i = self.currentPathFlowsOverIts[OD][-1]
                 h_next = self.targetFlowOverIts[OD][-1]
                 h_star = optimalSol[OD]
+                
+                paths = self.allPathsODCache[OD]
+                
+                diff_next_i = [h_next[str(path)] - h_i[str(path)] for path in paths]
+                diff_star_i = [h_star[str(path)] - h_i[str(path)] for path in paths]
 
-                bound_val = (abs(bound_lambda) * norm(np.array(list(dict_difference(h_next, h_i).values()))))
-                actual_val = (norm(np.array(list(dict_difference(h_star, h_i).values()))))
+                bound_val = abs(bound_lambda) * norm(np.array(diff_next_i))
+                actual_val = norm(np.array(diff_star_i))
+                
                 looseness += abs(bound_val - actual_val)
+                self.bound_gap = looseness
             
         if optimalSol is not None:
             print("Bound gap is", looseness)
@@ -488,7 +530,7 @@ class StochasticUE:
         """
         bound_satisfied = True
 
-        Bound_not_satisfied_OD ={}
+        Bound_not_satisfied_OD = {}
 
         if self.it < 2:
             return
@@ -502,22 +544,55 @@ class StochasticUE:
             h_next = self.targetPathFlows[OD]
             bound_lambda = self.currentLmabda[OD]
 
-            actual_val = norm(np.array(list(dict_difference(h_star, h_i).values())))
-            bound_val = abs(bound_lambda) * norm(np.array(list(dict_difference(h_next, h_i).values())))
+            # FIX: Extract path flows in strict order using the cache
+            paths = self.allPathsODCache[OD]
+            
+            diff_star_i = [h_star[str(path)] - h_i[str(path)] for path in paths]
+            diff_next_i = [h_next[str(path)] - h_i[str(path)] for path in paths]
+
+            actual_val = norm(np.array(diff_star_i))
+            bound_val = abs(bound_lambda) * norm(np.array(diff_next_i))
+
+
+            
+            # print("\nLambda: ", bound_lambda)
             # print(f"OD: {OD}, Actual: {actual_val}, Bound: {bound_val}")
-            if actual_val > bound_val:
+            
+            tolerance = 1e-4
+            if actual_val > bound_val + tolerance:
+                # print(actual_val, bound_val, actual_val - bound_val)
+
                 bound_satisfied = False
-                Bound_not_satisfied_OD[OD] = (bound_val - actual_val)
+                Bound_not_satisfied_OD[OD] = (actual_val - bound_val) # Flipped to show positive violation gap
                 # print("Bound not satisfied", actual_val, bound_val)
 
         if bound_satisfied:
             print(f"{self.it}: Bound satisfied")
-            # print("Iteration: ", self.it)
-            # print("Gap: ", self.gap)
-            # quit()
         else:
             print(f"{self.it}: Bound not satisfied in {len(Bound_not_satisfied_OD)} OD out of {len(self.tripSet)}")
-            # print(Bound_not_satisfied_OD)
+
+
+        satisfied_bound_gap = self.bound_gap if bound_satisfied else "Bound not satisfied"
+
+        self.iterationBoundTest.append({
+            "iteration": self.it,
+            "gap": self.gap,
+            "bound satisfied?": bound_satisfied,
+            "bound gap": satisfied_bound_gap,
+            "percentage OD satisfying bound": (len(self.tripSet) - len(Bound_not_satisfied_OD)) / len(self.tripSet) * 100,
+            "values of OD not satisfying bound": Bound_not_satisfied_OD
+        })
+    
+    def finalBoundResults(self, networkName):
+        print("Final bound results:")
+        # print self.iterationBoundTest in a readable format
+        for result in self.iterationBoundTest:
+            print(f"Iteration: {result['iteration']}, Gap: {result['gap']}, Bound satisfied: {result['bound satisfied?']}, Percentage OD satisfying bound: {result['percentage OD satisfying bound']}%")
+            # print(f"OD not satisfying bound and their values: {result['values of OD not satisfying bound']}")
+        
+        # save a csv of the results
+        df = pd.DataFrame(self.iterationBoundTest)
+        df.to_csv(f'boundTest/{networkName}_{self.theta}_r{self.r}.csv', index=False)
             
 
     def linkBound(self):
