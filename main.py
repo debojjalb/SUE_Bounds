@@ -78,7 +78,10 @@ def run(inputLocation, plot, calBounds, k=10, theta=0.5, r=0.5, debug = False):
 
 
 if __name__ == "__main__":
-    input_location_list = ["testNetworks/Sioux Falls Network/", "testNetworks/Berlin MC Network/", "testNetworks/EMA Network/", "testNetworks/Anaheim Network/"]
+    # input_location_list = ["testNetworks/Sioux Falls Network/", "testNetworks/Berlin MC Network/", "testNetworks/EMA Network/", "testNetworks/Anaheim Network/"]
     # input_location_list = ["testNetworks/Sioux Falls Network/"]
+
+    input_location_list = [ "testNetworks/Berlin MC Network/", "testNetworks/EMA Network/", "testNetworks/Anaheim Network/"]
+
     for inputLocation in input_location_list:
         run(inputLocation, plot = False, calBounds = True)
