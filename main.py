@@ -4,7 +4,7 @@ from genPlots import *
 import pickle
 from helper import convert_network_tntp_to_dat, convert_demand_tntp_to_dat
 
-def run(inputLocation, plot, calBounds, k=10, theta=0.5, r=0.5, debug = False):
+def run(inputLocation, plot, calBounds, r, k=10, theta=0.5, debug = False):
     """
     Runs the traffic assignment for a given network location and checks the bounds on each feasible solution.
     :param inputLocation: str, path to the network files
@@ -78,10 +78,10 @@ def run(inputLocation, plot, calBounds, k=10, theta=0.5, r=0.5, debug = False):
 
 
 if __name__ == "__main__":
-    # input_location_list = ["testNetworks/Sioux Falls Network/", "testNetworks/Berlin MC Network/", "testNetworks/EMA Network/", "testNetworks/Anaheim Network/"]
+    input_location_list = ["testNetworks/Sioux Falls Network/", "testNetworks/Berlin MC Network/", "testNetworks/EMA Network/", "testNetworks/Anaheim Network/"]
     # input_location_list = ["testNetworks/Sioux Falls Network/"]
 
-    input_location_list = [ "testNetworks/Winnipeg Network/", "testNetworks/Chicago Sketch Network/"]
 
     for inputLocation in input_location_list:
-        run(inputLocation, plot = False, calBounds = True)
+        for r in [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]:
+            run(inputLocation, plot = False, calBounds = True, r=r)
