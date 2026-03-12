@@ -8,7 +8,7 @@ from helper import dict_difference
 import numpy as np
 import shutil
 
-random.seed(42)
+random.seed(0)
 
 def PlotLinkFlowBound(stochasticUE, optimalLinkFlows, folder, neworkname):
     """
@@ -83,8 +83,6 @@ def PlotLinkFlowBound(stochasticUE, optimalLinkFlows, folder, neworkname):
     plt.savefig(f'{folder}/log link flow bound.pdf')
     plt.close()
 
-    # shutil.copy(f'{folder}/link flow bound.pdf', f'./Plots/paperPlots/{neworkname}_link flow bound.pdf')
-    # shutil.copy(f'{folder}/link flow bound last 20.pdf', f'./Plots/paperPlots/{neworkname}_link flow bound last 20.pdf')
     shutil.copy(f'{folder}/log link flow bound.pdf', f'./Plots/paperPlots/{neworkname}_log link flow bound.pdf')
     
 def PlotTTBound(stochasticUE, ooptimalLinkCost, folder, neworkname):
@@ -157,8 +155,6 @@ def PlotTTBound(stochasticUE, ooptimalLinkCost, folder, neworkname):
     plt.savefig(f'{folder}/log travel time bound.pdf')
     plt.close()
 
-    # shutil.copy(f'{folder}/travel time bound.pdf', f'./Plots/paperPlots/{neworkname}_travel time bound.pdf')
-    # shutil.copy(f'{folder}/travel time bound last 20.pdf', f'./Plots/paperPlots/{neworkname}_travel time bound last 20.pdf')
     shutil.copy(f'{folder}/log travel time bound.pdf', f'./Plots/paperPlots/{neworkname}_log travel time bound.pdf')
 
 def PlotTSTTBound(stochasticUE, optimalTSTT, folder, neworkname):
@@ -232,8 +228,6 @@ def PlotTSTTBound(stochasticUE, optimalTSTT, folder, neworkname):
     plt.savefig(f'{folder}/log TSTT_Bound.pdf')
     plt.close()
 
-    # shutil.copy(f'{folder}/TSTT_Bound.pdf', f'./Plots/paperPlots/{neworkname}_TSTT_Bound.pdf')
-    # shutil.copy(f'{folder}/TSTT_Bound_last_20.pdf', f'./Plots/paperPlots/{neworkname}_TSTT_Bound_last_20.pdf')
     shutil.copy(f'{folder}/log TSTT_Bound.pdf', f'./Plots/paperPlots/{neworkname}_log TSTT_Bound.pdf')
 
 # def PlotBound(stochasticUE, optimalSol, folder, r, neworkname):
@@ -570,31 +564,56 @@ def PlotBound(stochasticUE, optimalSol, folder, r, networkname, target_OD):
         actual.append(norm(np.array(list(dict_difference(h_star, h_i).values()))))
     
     # 1. Plot normal Bound vs Actual
-    plt.figure(figsize=(8, 6))
-    plt.plot(x_values, actual, label='Actual distance from eqm.', linewidth=3)
-    plt.plot(x_values, bound, label='Bound on distance from eqm.', linewidth=3)
-    plt.xlabel('Iterations', fontsize=18)
-    plt.ylabel('Norm', fontsize=18)
-    plt.title(f'OD: {target_OD}', fontsize=18)
-    plt.xticks(fontsize=14)
-    plt.yticks(fontsize=14)
-    plt.legend(fontsize=12)
-    plt.tight_layout()
-    plt.savefig(f'./Plots/paperPlots/{networkname}_Bound_{target_OD}.pdf')
-    plt.close()
+    # plt.figure(figsize=(8, 6))
+    # plt.plot(x_values, actual, label='Actual distance from eqm.', linewidth=3)
+    # plt.plot(x_values, bound, label='Bound on distance from eqm.', linewidth=3)
+    # plt.xlabel('Iterations', fontsize=34)
+    # plt.ylabel('Norm', fontsize=34)
+    # plt.xticks(fontsize=26)
+    # plt.yticks(fontsize=26)
+    # plt.legend(fontsize=22, loc='upper center', bbox_to_anchor=(0.5, -0.15))
+    # plt.tight_layout()
+    # plt.savefig(f'./Plots/paperPlots/{networkname}_Bound_{target_OD}.pdf')
+    # plt.close()
 
-    # 2. Plot Log Bound vs Log Actual
-    plt.figure(figsize=(8, 6))
-    plt.plot(x_values[1:], np.log(actual)[1:], label='Actual distance from eqm.', linewidth=3)
-    plt.plot(x_values[1:], np.log(bound)[1:], label='Bound on distance from eqm.', linewidth=3)
-    plt.xlabel('Iterations', fontsize=18)
-    plt.ylabel('Log norm', fontsize=18) 
-    plt.title(f'OD: {target_OD}', fontsize=18)
-    plt.xticks(fontsize=14)
-    plt.yticks(fontsize=14)
-    plt.legend(fontsize=12)
+    # # 2. Plot Log Bound vs Log Actual
+    # plt.figure(figsize=(8, 6))
+    # plt.plot(x_values[1:], np.log(actual)[1:], label='Actual distance from eqm.', linewidth=3)
+    # plt.plot(x_values[1:], np.log(bound)[1:], label='Bound on distance from eqm.', linewidth=3)
+    # plt.xlabel('Iterations', fontsize=34)
+    # plt.ylabel('Log norm', fontsize=34)
+    # plt.xticks(fontsize=26)
+    # plt.yticks(fontsize=26)
+    # plt.legend(fontsize=22, loc='upper center', bbox_to_anchor=(0.5, -0.15))
+    # plt.tight_layout()
+    # plt.savefig(f'./Plots/paperPlots/{networkname}_LogBound_{target_OD}.pdf')
+    # plt.close()
+
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(22, 8))
+
+    # --- First Subplot: Normal Scale ---
+    l1, = ax1.plot(x_values, actual, label='Actual distance from equilibrium', linewidth=3)
+    l2, = ax1.plot(x_values, bound, label='Bound on distance from equilibrium.', linewidth=3)
+    ax1.set_xlabel('Iterations', fontsize=34)
+    ax1.set_ylabel('Norm', fontsize=34)
+    ax1.tick_params(axis='both', labelsize=26)
+
+    # --- Second Subplot: Log Scale ---
+    ax2.plot(x_values[1:], np.log(actual)[1:], label='Actual distance from equilibrium.', linewidth=3)
+    ax2.plot(x_values[1:], np.log(bound)[1:], label='Bound on distance from equilibrium', linewidth=3)
+    ax2.set_xlabel('Iterations', fontsize=34)
+    ax2.set_ylabel('Log norm', fontsize=34)
+    ax2.tick_params(axis='both', labelsize=26)
+
     plt.tight_layout()
-    plt.savefig(f'./Plots/paperPlots/{networkname}_LogBound_{target_OD}.pdf')
+
+    fig.subplots_adjust(bottom=0.28, wspace=0.3)
+
+    fig.legend([l1, l2], ['Actual distance from equilibrium', 'Bound on distance from equilibrium'], 
+            fontsize=22, loc='lower center', ncol=2, bbox_to_anchor=(0.5, 0.05))
+
+    # Save the combined figure
+    plt.savefig(f'./Plots/paperPlots/{networkname}_CombinedBound_{target_OD}.pdf')
     plt.close()
 
     return target_OD
@@ -641,11 +660,11 @@ def plotConvergence(stochasticUE, optimalSol, folder, r, networkname, target_OD)
         
         plt.figure(figsize=(8, 6))
         plt.plot(x_values, convergence_data, label='Bound gap', linewidth=3, linestyle='-')
-        plt.xlabel('Iterations', fontsize=18)
-        plt.ylabel('Norm', fontsize=18)
-        plt.title(f'OD: {target_OD}', fontsize=18)
-        plt.xticks(fontsize=14)
-        plt.yticks(fontsize=14)
+        plt.xlabel('Iterations', fontsize=34)
+        plt.ylabel('Norm', fontsize=34)
+        # plt.title(f'OD: {target_OD}', fontsize=34)
+        plt.xticks(fontsize=26)
+        plt.yticks(fontsize=26)
         plt.tight_layout()
         plt.savefig(f'./Plots/paperPlots/{networkname}_Convergence_{target_OD}.pdf')
         plt.close()
@@ -717,12 +736,12 @@ def plotConvergence(stochasticUE, optimalSol, folder, r, networkname, target_OD)
             plt.figure(figsize=(8, 6))
             plt.plot(ratios, linestyle='-', label=r'$|c_{i+1}| / |c_i|$', linewidth=3)
             plt.axhline(y=mean_ratio_end_target, color='r', linestyle='--', label=f'Mean Rate: {mean_ratio_end_target:.2f}', linewidth=2)
-            plt.xlabel('Iteration', fontsize=18)
-            plt.ylabel('Convergence rate', fontsize=18)
-            plt.title(f"OD: {target_OD}\nRate: {mean_ratio_end_target:.2f}", fontsize=18)
-            plt.xticks(fontsize=14)
-            plt.yticks(fontsize=14)
-            plt.legend(fontsize=14)
+            plt.xlabel('Iteration', fontsize=34)
+            plt.ylabel('Convergence rate', fontsize=34)
+            # plt.title(f"OD: {target_OD}", fontsize=34)
+            plt.xticks(fontsize=26)
+            plt.yticks(fontsize=26)
+            plt.legend(fontsize=22)
             plt.tight_layout()
             
             plt.savefig(f'./Plots/paperPlots/{networkname}_ConvergenceRate_{target_OD}.pdf')
