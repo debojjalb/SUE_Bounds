@@ -356,6 +356,8 @@ class StochasticUE:
         epsilon = 0.01
 
         start_time = time.time()
+        last_time = time.time()
+        time_spent_each_iteration = []
 
         for it in range(1, maxIter):
             
@@ -377,7 +379,11 @@ class StochasticUE:
 
             prev_gap.append(self.gap)
 
-            print(f"Current gap: {self.gap}, iteration: {it}, and time elapsed: {time.time() - start_time}")
+            time_elapsed = time.time() - last_time
+            last_time = time.time()
+            time_spent_each_iteration.append(time_elapsed)
+
+            print(f"Current gap: {self.gap}, iteration: {it}, and time elapsed: {time_elapsed}")
             self.optimalSol = self.currentPathFlows
             self.optimalLinkFlows = self.linkFlows
             self.optimalLinkCost = self.linkCosts
@@ -417,6 +423,12 @@ class StochasticUE:
         if not converged:
             print("The assignment did not converge with the desired gap and max iterations are reached")
             print("Current gap: ", self.gap)
+        
+        average_time = sum(time_spent_each_iteration) / len(time_spent_each_iteration)
+        print(f"\nAverage time spent on each iteration: {average_time} seconds\n")
+
+        with open(f'paperResults/{networkName}_{self.theta}_r{self.r}_bounds{calBounds}_time.txt', 'w') as f:
+           f.write(f"Average time spent on each iteration: {average_time} seconds\n")
 
 
     """

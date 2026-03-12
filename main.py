@@ -83,5 +83,6 @@ if __name__ == "__main__":
 
 
     for inputLocation in input_location_list:
-        for r in [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]:
-            run(inputLocation, plot = False, calBounds = True, r=r)
+        # for r in [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]:
+        r = 0.4
+        run(inputLocation, plot = True, calBounds = True, r=r)

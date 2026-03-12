@@ -83,8 +83,8 @@ def PlotLinkFlowBound(stochasticUE, optimalLinkFlows, folder, neworkname):
     plt.savefig(f'{folder}/log link flow bound.pdf')
     plt.close()
 
-    shutil.copy(f'{folder}/link flow bound.pdf', f'./Plots/paperPlots/{neworkname}_link flow bound.pdf')
-    shutil.copy(f'{folder}/link flow bound last 20.pdf', f'./Plots/paperPlots/{neworkname}_link flow bound last 20.pdf')
+    # shutil.copy(f'{folder}/link flow bound.pdf', f'./Plots/paperPlots/{neworkname}_link flow bound.pdf')
+    # shutil.copy(f'{folder}/link flow bound last 20.pdf', f'./Plots/paperPlots/{neworkname}_link flow bound last 20.pdf')
     shutil.copy(f'{folder}/log link flow bound.pdf', f'./Plots/paperPlots/{neworkname}_log link flow bound.pdf')
     
 def PlotTTBound(stochasticUE, ooptimalLinkCost, folder, neworkname):
@@ -157,8 +157,8 @@ def PlotTTBound(stochasticUE, ooptimalLinkCost, folder, neworkname):
     plt.savefig(f'{folder}/log travel time bound.pdf')
     plt.close()
 
-    shutil.copy(f'{folder}/travel time bound.pdf', f'./Plots/paperPlots/{neworkname}_travel time bound.pdf')
-    shutil.copy(f'{folder}/travel time bound last 20.pdf', f'./Plots/paperPlots/{neworkname}_travel time bound last 20.pdf')
+    # shutil.copy(f'{folder}/travel time bound.pdf', f'./Plots/paperPlots/{neworkname}_travel time bound.pdf')
+    # shutil.copy(f'{folder}/travel time bound last 20.pdf', f'./Plots/paperPlots/{neworkname}_travel time bound last 20.pdf')
     shutil.copy(f'{folder}/log travel time bound.pdf', f'./Plots/paperPlots/{neworkname}_log travel time bound.pdf')
 
 def PlotTSTTBound(stochasticUE, optimalTSTT, folder, neworkname):
@@ -232,149 +232,382 @@ def PlotTSTTBound(stochasticUE, optimalTSTT, folder, neworkname):
     plt.savefig(f'{folder}/log TSTT_Bound.pdf')
     plt.close()
 
-    shutil.copy(f'{folder}/TSTT_Bound.pdf', f'./Plots/paperPlots/{neworkname}_TSTT_Bound.pdf')
-    shutil.copy(f'{folder}/TSTT_Bound_last_20.pdf', f'./Plots/paperPlots/{neworkname}_TSTT_Bound_last_20.pdf')
+    # shutil.copy(f'{folder}/TSTT_Bound.pdf', f'./Plots/paperPlots/{neworkname}_TSTT_Bound.pdf')
+    # shutil.copy(f'{folder}/TSTT_Bound_last_20.pdf', f'./Plots/paperPlots/{neworkname}_TSTT_Bound_last_20.pdf')
     shutil.copy(f'{folder}/log TSTT_Bound.pdf', f'./Plots/paperPlots/{neworkname}_log TSTT_Bound.pdf')
 
-def PlotBound(stochasticUE, optimalSol, folder, r, neworkname):
-    """
-    Plots the bounds on path flows against the actual distance from the optimal path flows over iterations.
-    """
-    for OD in tqdm(stochasticUE.currentPathFlowsOverIts):
+# def PlotBound(stochasticUE, optimalSol, folder, r, neworkname):
+#     """
+#     Plots the bounds on path flows against the actual distance from the optimal path flows over iterations.
+#     """
+#     for OD in tqdm(stochasticUE.currentPathFlowsOverIts):
 
-        if OD in stochasticUE.od_with_no_assignments:
-            continue
+#         if OD in stochasticUE.od_with_no_assignments:
+#             continue
 
-        curr_path_flow = stochasticUE.currentPathFlowsOverIts[OD]
-        target_path_flow = stochasticUE.targetFlowOverIts[OD]
-        lambdas = stochasticUE.lambdaMaxOverIts[OD]
-        optimalPathFlow = optimalSol[OD]
+#         curr_path_flow = stochasticUE.currentPathFlowsOverIts[OD]
+#         target_path_flow = stochasticUE.targetFlowOverIts[OD]
+#         lambdas = stochasticUE.lambdaMaxOverIts[OD]
+#         optimalPathFlow = optimalSol[OD]
         
-        x_values = []
-        bound = []
-        actual = []
-        h_star = optimalPathFlow
+#         x_values = []
+#         bound = []
+#         actual = []
+#         h_star = optimalPathFlow
 
-        for it in range(len(curr_path_flow) - 1):
+#         for it in range(len(curr_path_flow) - 1):
             
-            h_i = curr_path_flow[it]
-            h_next = target_path_flow[it]
-            x_values.append(it)
+#             h_i = curr_path_flow[it]
+#             h_next = target_path_flow[it]
+#             x_values.append(it)
 
-            bound.append(abs(lambdas[it]) * norm(np.array(list(dict_difference(h_next, h_i).values()))))
-            actual.append(norm(np.array(list(dict_difference(h_star, h_i).values()))))
+#             bound.append(abs(lambdas[it]) * norm(np.array(list(dict_difference(h_next, h_i).values()))))
+#             actual.append(norm(np.array(list(dict_difference(h_star, h_i).values()))))
         
-        # Plot the bound and actual distance from eqm.
-        plt.plot(x_values, actual, label='Actual distance from eqm.', linewidth = 3)
-        plt.plot(x_values, bound, label='Bound on distance from eqm.', linewidth=3)
-        plt.xlabel('Iterations', fontsize=18)
-        plt.ylabel('Norm', fontsize=18)
-        plt.title('OD: {}'.format(OD), fontsize=18)
-        plt.xticks(fontsize=14)
-        plt.yticks(fontsize=14)
-        # plt.grid(True)
-        plt.legend(fontsize=12)
-        plt.savefig(f'{folder}/Bound/r{r}_bound matrix h bound for OD pair {OD}.pdf')
-        plt.tight_layout()
-        plt.close()
+#         # Plot the bound and actual distance from eqm.
+#         plt.plot(x_values, actual, label='Actual distance from eqm.', linewidth = 3)
+#         plt.plot(x_values, bound, label='Bound on distance from eqm.', linewidth=3)
+#         plt.xlabel('Iterations', fontsize=18)
+#         plt.ylabel('Norm', fontsize=18)
+#         plt.title('OD: {}'.format(OD), fontsize=18)
+#         plt.xticks(fontsize=14)
+#         plt.yticks(fontsize=14)
+#         # plt.grid(True)
+#         plt.legend(fontsize=12)
+#         plt.savefig(f'{folder}/Bound/r{r}_bound matrix h bound for OD pair {OD}.pdf')
+#         plt.tight_layout()
+#         plt.close()
 
-        # Log plot of the bound and actual distance from eqm.
-        plt.plot(x_values[1:], np.log(actual)[1:], label='Actual distance from eqm.', linewidth = 3)
-        plt.plot(x_values[1:], np.log(bound)[1:], label='Bound on distance from eqm.', linewidth=3)
-        plt.xlabel('Iterations', fontsize=18)
-        plt.ylabel('Log norm', fontsize=18) 
-        plt.title('OD: {}'.format(OD), fontsize=18)
-        plt.xticks(fontsize=14)
-        plt.yticks(fontsize=14)
-        # plt.grid(True)
-        plt.legend(fontsize=12)
-        plt.tight_layout()
-        plt.savefig(f'{folder}/LogBound/r{r}_log bound matrix h bound for OD pair {OD}.pdf')
-        plt.close()
+#         # Log plot of the bound and actual distance from eqm.
+#         plt.plot(x_values[1:], np.log(actual)[1:], label='Actual distance from eqm.', linewidth = 3)
+#         plt.plot(x_values[1:], np.log(bound)[1:], label='Bound on distance from eqm.', linewidth=3)
+#         plt.xlabel('Iterations', fontsize=18)
+#         plt.ylabel('Log norm', fontsize=18) 
+#         plt.title('OD: {}'.format(OD), fontsize=18)
+#         plt.xticks(fontsize=14)
+#         plt.yticks(fontsize=14)
+#         # plt.grid(True)
+#         plt.legend(fontsize=12)
+#         plt.tight_layout()
+#         plt.savefig(f'{folder}/LogBound/r{r}_log bound matrix h bound for OD pair {OD}.pdf')
+#         plt.close()
     
-    all_OD = list(optimalSol.keys())
-    all_OD = [OD for OD in all_OD if OD not in stochasticUE.od_with_no_assignments]
+#     all_OD = list(optimalSol.keys())
+#     all_OD = [OD for OD in all_OD if OD not in stochasticUE.od_with_no_assignments]
 
-    try: 
-        OD_sample = random.sample(all_OD, 16)
+#     try: 
+#         OD_sample = random.sample(all_OD, 16)
 
-        # Plot 5x5 graphs of random OD pairs
-        for _i in range(5):
+#         # Plot 5x5 graphs of random OD pairs
+#         for _i in range(5):
             
-            fig, axs = plt.subplots(4, 4, figsize=(15, 15))
+#             fig, axs = plt.subplots(4, 4, figsize=(15, 15))
 
-            for i, OD in enumerate(OD_sample):
+#             for i, OD in enumerate(OD_sample):
 
-                row, col = divmod(i, 4)
+#                 row, col = divmod(i, 4)
 
-                x_values = np.arange(1, len(actual) + 1)
-                actual = np.array(actual)
-                bound = np.array(bound)
+#                 x_values = np.arange(1, len(actual) + 1)
+#                 actual = np.array(actual)
+#                 bound = np.array(bound)
 
-                axs[row, col].plot(x_values, actual, linestyle='-', label='Actual', linewidth=3)
-                axs[row, col].plot(x_values, bound, linestyle='-',label='Bound', linewidth=3)
-                axs[row, col].set_title(f"OD: {OD}", fontsize=22)
+#                 axs[row, col].plot(x_values, actual, linestyle='-', label='Actual', linewidth=3)
+#                 axs[row, col].plot(x_values, bound, linestyle='-',label='Bound', linewidth=3)
+#                 axs[row, col].set_title(f"OD: {OD}", fontsize=22)
 
-                axs[row, col].set_xlabel('Iterations', fontsize=20)
-                axs[row, col].set_ylabel('Norm', fontsize=20)
-                axs[row, col].tick_params(axis='x', labelsize=20)
-                axs[row, col].tick_params(axis='y', labelsize=20)
+#                 axs[row, col].set_xlabel('Iterations', fontsize=20)
+#                 axs[row, col].set_ylabel('Norm', fontsize=20)
+#                 axs[row, col].tick_params(axis='x', labelsize=20)
+#                 axs[row, col].tick_params(axis='y', labelsize=20)
 
-                if row == 0 and col == 3:
-                    axs[row, col].legend(fontsize=15)
-                # axs[row, col].grid(True)
+#                 if row == 0 and col == 3:
+#                     axs[row, col].legend(fontsize=15)
+#                 # axs[row, col].grid(True)
 
-            plt.tight_layout()
-            plt.savefig(f'{folder}/Multiplots/Bound_{_i}.pdf')
-            plt.close()
+#             plt.tight_layout()
+#             plt.savefig(f'{folder}/Multiplots/Bound_{_i}.pdf')
+#             plt.close()
 
-        shutil.copy(f'{folder}/Multiplots/Bound_{_i}.pdf', f'./Plots/paperPlots/{neworkname}_Bound_{_i}.pdf')
+#         shutil.copy(f'{folder}/Multiplots/Bound_{_i}.pdf', f'./Plots/paperPlots/{neworkname}_Bound_{_i}.pdf')
 
-        # Plot 5x5 graphs of random OD pairs
+#         # Plot 5x5 graphs of random OD pairs
 
-        for _i in range(5):
+#         for _i in range(5):
 
-            fig, axs = plt.subplots(4, 4, figsize=(15, 15))
+#             fig, axs = plt.subplots(4, 4, figsize=(15, 15))
 
-            for i, OD in enumerate(OD_sample):
+#             for i, OD in enumerate(OD_sample):
 
-                row, col = divmod(i, 4)
+#                 row, col = divmod(i, 4)
 
-                x_values = np.arange(1, len(actual) + 1)
-                actual = np.array(actual)
-                bound = np.array(bound)
+#                 x_values = np.arange(1, len(actual) + 1)
+#                 actual = np.array(actual)
+#                 bound = np.array(bound)
 
-                axs[row, col].plot(x_values, np.log(actual), linestyle='-', label='Actual', linewidth=3)
-                axs[row, col].plot(x_values, np.log(bound), linestyle='-', label='Bound', linewidth=3)
-                axs[row, col].set_xlabel('Iterations', fontsize=20)
-                axs[row, col].set_ylabel('Log Norm', fontsize=20)
-                axs[row, col].tick_params(axis='x', labelsize=20)
-                axs[row, col].tick_params(axis='y', labelsize=20)
-                # axs[row, col].grid(True
+#                 axs[row, col].plot(x_values, np.log(actual), linestyle='-', label='Actual', linewidth=3)
+#                 axs[row, col].plot(x_values, np.log(bound), linestyle='-', label='Bound', linewidth=3)
+#                 axs[row, col].set_xlabel('Iterations', fontsize=20)
+#                 axs[row, col].set_ylabel('Log Norm', fontsize=20)
+#                 axs[row, col].tick_params(axis='x', labelsize=20)
+#                 axs[row, col].tick_params(axis='y', labelsize=20)
+#                 # axs[row, col].grid(True
                 
-                axs[row, col].set_title(f"OD: {OD}", fontsize=22)
-                if row == 0 and col == 3:
-                    axs[row, col].legend(fontsize=15)
+#                 axs[row, col].set_title(f"OD: {OD}", fontsize=22)
+#                 if row == 0 and col == 3:
+#                     axs[row, col].legend(fontsize=15)
 
-            plt.tight_layout()
-            plt.savefig(f'{folder}/Multiplots/LogBound_{_i}.pdf')
-            plt.close()
+#             plt.tight_layout()
+#             plt.savefig(f'{folder}/Multiplots/LogBound_{_i}.pdf')
+#             plt.close()
         
-        shutil.copy(f'{folder}/Multiplots/LogBound_{_i}.pdf', f'./Plots/paperPlots/{neworkname}_LogBound_{_i}.pdf')
-    except ValueError:
-        OD_sample = []
-        pass
-    return OD_sample
+#         shutil.copy(f'{folder}/Multiplots/LogBound_{_i}.pdf', f'./Plots/paperPlots/{neworkname}_LogBound_{_i}.pdf')
+#     except ValueError:
+#         OD_sample = []
+#         pass
+#     return OD_sample
 
-def plotConvergence(stochasticUE, optimalSol, folder, r, networkname, OD_sample):
-    """
-    Plots the convergence of the bounds on path flows against the actual distance from the optimal path flows over iterations.
-    """
+# def plotConvergence(stochasticUE, optimalSol, folder, r, networkname, OD_sample):
+#     """
+#     Plots the convergence of the bounds on path flows against the actual distance from the optimal path flows over iterations.
+#     """
 
+#     error_od = {}
+
+#     for OD in stochasticUE.currentPathFlowsOverIts:
+
+#         if OD in stochasticUE.od_with_no_assignments:
+#             continue
+
+#         curr_path_flow = stochasticUE.currentPathFlowsOverIts[OD]
+#         target_path_flow = stochasticUE.targetFlowOverIts[OD]
+#         lambdas = stochasticUE.lambdaMaxOverIts[OD]
+#         optimalPathFlow = optimalSol[OD]
+        
+#         x_values = []
+#         bound = []
+#         actual = []
+#         convergence = []
+#         h_star = optimalPathFlow
+
+#         for it in range(len(curr_path_flow) - 1):
+            
+#             h_i = curr_path_flow[it]
+#             h_next = target_path_flow[it]
+#             x_values.append(it)
+
+#             bound.append(abs(lambdas[it]) * norm(np.array(list(dict_difference(h_next, h_i).values()))))
+#             actual.append(norm(np.array(list(dict_difference(h_star, h_i).values()))))
+#             convergence.append((bound[-1] - actual[-1]))
+        
+#         error_od[OD] = convergence
+
+#         # Plot the convergence
+#         plt.plot(x_values, convergence, label='Bound gap', linewidth = 3, linestyle='-')
+#         plt.xlabel('Iterations', fontsize=18)
+#         plt.ylabel('Norm', fontsize=18)
+#         plt.title('OD: {}'.format(OD), fontsize=18)
+#         # plt.grid(True)
+#         # plt.legend(fontsize=14)
+#         plt.xticks(fontsize=14)
+#         plt.yticks(fontsize=14)
+#         plt.savefig(f'{folder}/Convergence/r{r}_convergence matrix h bound for OD pair {OD}.pdf')
+#         plt.close()
+    
+#     try:
+#     # plot 5, 5x5 graphs of random convergence
+#         for _i in range(5):
+#             fig, axs = plt.subplots(4, 4, figsize=(15, 15))  
+
+#             for i, OD in enumerate(OD_sample):
+#                 row, col = divmod(i, 4)  
+
+#                 x_values = np.arange(1, len(error_od[OD]) + 1)
+#                 error = np.array(error_od[OD])
+#                 error = np.abs(error)
+
+#                 axs[row, col].plot(x_values, error, linestyle='-', linewidth=3)
+#                 axs[row, col].set_xlabel('Iterations', fontsize=20)
+#                 axs[row, col].set_ylabel('Bound gap', fontsize=20)
+#                 axs[row, col].set_title(f"OD: {OD}", fontsize=22)
+#                 axs[row, col].tick_params(axis='x', labelsize=20)
+#                 axs[row, col].tick_params(axis='y', labelsize=20)
+#                 # axs[row, col].grid(True)
+#             plt.tight_layout()
+#             plt.savefig(f'{folder}/Multiplots/Convergence_{_i}.pdf')
+#             plt.close()
+        
+#         shutil.copy(f'{folder}/Multiplots/Convergence_{_i}.pdf', f'./Plots/paperPlots/{networkname}_Convergence_{_i}.pdf')
+
+#     except ValueError:
+#         pass
+
+#     all_OD = list(optimalSol.keys())
+#     all_OD = [OD for OD in all_OD if OD not in stochasticUE.od_with_no_assignments]
+
+#     convergence_rate = {}
+#     for i, OD in enumerate(all_OD):
+#         error = np.array(error_od[OD])  
+#         iterations = np.arange(1, len(error) + 1)
+
+#         nonzero_indices = error > 0
+#         iterations = iterations[nonzero_indices]
+#         error = error[nonzero_indices]
+
+
+#         if len(iterations) > 2:
+#             # Compute empirical convergence rate |x_{i+1}| / |x_i|
+#             ratios = np.abs(error[1:] / error[:-1])
+
+#             num_points = max(1, len(ratios) // 4)
+#             ratios_subset = ratios[-num_points:]
+
+#             mean_ratio = np.mean(ratios)
+#             std_ratio = np.std(ratios)
+
+#             mean_ratio_end = np.mean(ratios_subset)
+#             mean_std_ratio = np.std(ratios_subset)
+
+#             convergence_rate[OD] = (mean_ratio, std_ratio, mean_ratio_end, mean_std_ratio)
+
+#     df = pd.DataFrame(convergence_rate, index=['Mean', 'SD', 'Mean_end', 'SD_end']).T
+#     df.to_csv(f'{folder}/ConvergenceRate.csv')
+    
+#     x = [rate[0] for rate in convergence_rate.values()]
+#     mean_rate = np.mean(x)
+#     std_rate = np.std(x)
+
+#     x = [rate[2] for rate in convergence_rate.values()]
+#     mean_rate_end = np.mean(x)
+#     std_rate_end = np.std(x)
+
+#     print(f"Mean rate: {mean_rate:.2f}, SD: {std_rate:.2f}")
+#     print(f"Mean rate end: {mean_rate_end:.2f}, SD end: {std_rate_end:.2f}")
+
+#     with open(f'{folder}/ConvergenceRate.txt', 'w') as f:
+#         f.write(f"Mean rate: {mean_rate:.2f}, Pooled SD: {std_rate:.2f}")
+#         f.write(f"\nMean rate end: {mean_rate_end:.2f}, Pooled SD end: {std_rate_end:.2f}")
+#         f.close()
+
+#     try:
+#         for _i in range(5):
+
+#             all_OD = list(optimalSol.keys())
+#             all_OD = [OD for OD in all_OD if OD not in stochasticUE.od_with_no_assignments]
+
+#             fig, axs = plt.subplots(4, 4, figsize=(15, 15))
+
+#             for i, OD in enumerate(OD_sample):
+#                 row, col = divmod(i, 4)  
+
+#                 error = np.array(error_od[OD])  
+#                 iterations = np.arange(1, len(error) + 1)
+
+#                 nonzero_indices = error > 0
+#                 iterations = iterations[nonzero_indices]
+#                 error = error[nonzero_indices]
+
+#                 if len(iterations) > 2:
+#                     # Compute empirical convergence rate |x_{i+1}| / |x_i|
+#                     ratios = np.abs(error[1:] / error[:-1])
+
+#                     num_points = max(1, len(ratios) // 4)
+#                     ratios_subset = ratios[-num_points:]
+
+#                     mean_ratio = np.mean(ratios_subset)
+
+#                     # Plot in the corresponding subplot
+#                     ax = axs[row, col]
+#                     ax.plot(ratios, linestyle='-', label=r'$|c_{i+1}| / |c_i|$', linewidth=3)
+#                     ax.axhline(y=mean_ratio, color='r', linestyle='--', label=f'Mean Rate: {mean_ratio:.2f}', linewidth=2)
+#                     ax.set_xlabel('Iteration', fontsize=20)
+#                     ax.set_ylabel('Convergence rate', fontsize=20)
+#                     ax.set_title(f"OD: {OD}\nRate: {mean_ratio:.2f}", fontsize=22)
+#                     ax.tick_params(axis='x', labelsize=20)
+#                     ax.tick_params(axis='y', labelsize=20)
+#                     # ax.grid(True)
+                    
+
+
+#             plt.tight_layout()
+#             plt.savefig(f'{folder}/Multiplots/ConvergenceRate_{_i}.pdf')
+#             plt.close()
+        
+#         shutil.copy(f'{folder}/Multiplots/ConvergenceRate_{_i}.pdf', f'./Plots/paperPlots/{networkname}_ConvergenceRate_{_i}.pdf')
+
+#     except ValueError:
+#         pass
+
+def PlotBound(stochasticUE, optimalSol, folder, r, networkname, target_OD):
+    """
+    Plots the bounds on path flows against the actual distance from the optimal 
+    path flows over iterations for a single specified OD pair.
+    """
+    # Ensure the paper plots directory exists
+    os.makedirs('./Plots/paperPlots/', exist_ok=True)
+
+    # Safety check
+    if target_OD in stochasticUE.od_with_no_assignments or target_OD not in stochasticUE.currentPathFlowsOverIts:
+        raise ValueError(f"OD {target_OD} has no assignments. Skipping plot.")
+       
+
+    curr_path_flow = stochasticUE.currentPathFlowsOverIts[target_OD]
+    target_path_flow = stochasticUE.targetFlowOverIts[target_OD]
+    lambdas = stochasticUE.lambdaMaxOverIts[target_OD]
+    optimalPathFlow = optimalSol[target_OD]
+    
+    x_values = []
+    bound = []
+    actual = []
+    h_star = optimalPathFlow
+
+    # Calculate math ONLY for the single target OD pair
+    for it in range(len(curr_path_flow) - 1):
+        h_i = curr_path_flow[it]
+        h_next = target_path_flow[it]
+        x_values.append(it)
+
+        bound.append(abs(lambdas[it]) * norm(np.array(list(dict_difference(h_next, h_i).values()))))
+        actual.append(norm(np.array(list(dict_difference(h_star, h_i).values()))))
+    
+    # 1. Plot normal Bound vs Actual
+    plt.figure(figsize=(8, 6))
+    plt.plot(x_values, actual, label='Actual distance from eqm.', linewidth=3)
+    plt.plot(x_values, bound, label='Bound on distance from eqm.', linewidth=3)
+    plt.xlabel('Iterations', fontsize=18)
+    plt.ylabel('Norm', fontsize=18)
+    plt.title(f'OD: {target_OD}', fontsize=18)
+    plt.xticks(fontsize=14)
+    plt.yticks(fontsize=14)
+    plt.legend(fontsize=12)
+    plt.tight_layout()
+    plt.savefig(f'./Plots/paperPlots/{networkname}_Bound_{target_OD}.pdf')
+    plt.close()
+
+    # 2. Plot Log Bound vs Log Actual
+    plt.figure(figsize=(8, 6))
+    plt.plot(x_values[1:], np.log(actual)[1:], label='Actual distance from eqm.', linewidth=3)
+    plt.plot(x_values[1:], np.log(bound)[1:], label='Bound on distance from eqm.', linewidth=3)
+    plt.xlabel('Iterations', fontsize=18)
+    plt.ylabel('Log norm', fontsize=18) 
+    plt.title(f'OD: {target_OD}', fontsize=18)
+    plt.xticks(fontsize=14)
+    plt.yticks(fontsize=14)
+    plt.legend(fontsize=12)
+    plt.tight_layout()
+    plt.savefig(f'./Plots/paperPlots/{networkname}_LogBound_{target_OD}.pdf')
+    plt.close()
+
+    return target_OD
+
+def plotConvergence(stochasticUE, optimalSol, folder, r, networkname, target_OD):
+    """
+    Computes convergence metrics for all OD pairs but only plots convergence 
+    and convergence rate for a single specified target_OD to save processing time.
+    """
     error_od = {}
 
+    # 1. Analyze all OD pairs (Analysis remains unchanged)
     for OD in stochasticUE.currentPathFlowsOverIts:
-
         if OD in stochasticUE.od_with_no_assignments:
             continue
 
@@ -383,17 +616,14 @@ def plotConvergence(stochasticUE, optimalSol, folder, r, networkname, OD_sample)
         lambdas = stochasticUE.lambdaMaxOverIts[OD]
         optimalPathFlow = optimalSol[OD]
         
-        x_values = []
         bound = []
         actual = []
         convergence = []
         h_star = optimalPathFlow
 
         for it in range(len(curr_path_flow) - 1):
-            
             h_i = curr_path_flow[it]
             h_next = target_path_flow[it]
-            x_values.append(it)
 
             bound.append(abs(lambdas[it]) * norm(np.array(list(dict_difference(h_next, h_i).values()))))
             actual.append(norm(np.array(list(dict_difference(h_star, h_i).values()))))
@@ -401,51 +631,34 @@ def plotConvergence(stochasticUE, optimalSol, folder, r, networkname, OD_sample)
         
         error_od[OD] = convergence
 
-        # Plot the convergence
-        plt.plot(x_values, convergence, label='Bound gap', linewidth = 3, linestyle='-')
+    # Ensure output directory exists
+    os.makedirs('./Plots/paperPlots/', exist_ok=True)
+
+    # 2. Plot Convergence ONLY for the target_OD
+    if target_OD in error_od:
+        convergence_data = error_od[target_OD]
+        x_values = np.arange(1, len(convergence_data) + 1)
+        
+        plt.figure(figsize=(8, 6))
+        plt.plot(x_values, convergence_data, label='Bound gap', linewidth=3, linestyle='-')
         plt.xlabel('Iterations', fontsize=18)
         plt.ylabel('Norm', fontsize=18)
-        plt.title('OD: {}'.format(OD), fontsize=18)
-        # plt.grid(True)
-        # plt.legend(fontsize=14)
+        plt.title(f'OD: {target_OD}', fontsize=18)
         plt.xticks(fontsize=14)
         plt.yticks(fontsize=14)
-        plt.savefig(f'{folder}/Convergence/r{r}_convergence matrix h bound for OD pair {OD}.pdf')
+        plt.tight_layout()
+        plt.savefig(f'./Plots/paperPlots/{networkname}_Convergence_{target_OD}.pdf')
         plt.close()
-    
-    try:
-    # plot 5, 5x5 graphs of random convergence
-        for _i in range(5):
-            fig, axs = plt.subplots(4, 4, figsize=(15, 15))  
 
-            for i, OD in enumerate(OD_sample):
-                row, col = divmod(i, 4)  
-
-                x_values = np.arange(1, len(error_od[OD]) + 1)
-                error = np.array(error_od[OD])
-                error = np.abs(error)
-
-                axs[row, col].plot(x_values, error, linestyle='-', linewidth=3)
-                axs[row, col].set_xlabel('Iterations', fontsize=20)
-                axs[row, col].set_ylabel('Bound gap', fontsize=20)
-                axs[row, col].set_title(f"OD: {OD}", fontsize=22)
-                axs[row, col].tick_params(axis='x', labelsize=20)
-                axs[row, col].tick_params(axis='y', labelsize=20)
-                # axs[row, col].grid(True)
-            plt.tight_layout()
-            plt.savefig(f'{folder}/Multiplots/Convergence_{_i}.pdf')
-            plt.close()
-        
-        shutil.copy(f'{folder}/Multiplots/Convergence_{_i}.pdf', f'./Plots/paperPlots/{networkname}_Convergence_{_i}.pdf')
-
-    except ValueError:
-        pass
-
+    # 3. Calculate Convergence Rates for all valid OD pairs
     all_OD = list(optimalSol.keys())
     all_OD = [OD for OD in all_OD if OD not in stochasticUE.od_with_no_assignments]
 
     convergence_rate = {}
     for i, OD in enumerate(all_OD):
+        if OD not in error_od:
+            continue
+            
         error = np.array(error_od[OD])  
         iterations = np.arange(1, len(error) + 1)
 
@@ -453,89 +666,67 @@ def plotConvergence(stochasticUE, optimalSol, folder, r, networkname, OD_sample)
         iterations = iterations[nonzero_indices]
         error = error[nonzero_indices]
 
-
         if len(iterations) > 2:
             # Compute empirical convergence rate |x_{i+1}| / |x_i|
             ratios = np.abs(error[1:] / error[:-1])
-
             num_points = max(1, len(ratios) // 4)
             ratios_subset = ratios[-num_points:]
 
             mean_ratio = np.mean(ratios)
             std_ratio = np.std(ratios)
-
             mean_ratio_end = np.mean(ratios_subset)
             mean_std_ratio = np.std(ratios_subset)
 
             convergence_rate[OD] = (mean_ratio, std_ratio, mean_ratio_end, mean_std_ratio)
 
-    df = pd.DataFrame(convergence_rate, index=['Mean', 'SD', 'Mean_end', 'SD_end']).T
-    df.to_csv(f'{folder}/ConvergenceRate.csv')
-    
-    x = [rate[0] for rate in convergence_rate.values()]
-    mean_rate = np.mean(x)
-    std_rate = np.std(x)
-
-    x = [rate[2] for rate in convergence_rate.values()]
-    mean_rate_end = np.mean(x)
-    std_rate_end = np.std(x)
-
-    print(f"Mean rate: {mean_rate:.2f}, SD: {std_rate:.2f}")
-    print(f"Mean rate end: {mean_rate_end:.2f}, SD end: {std_rate_end:.2f}")
-
-    with open(f'{folder}/ConvergenceRate.txt', 'w') as f:
-        f.write(f"Mean rate: {mean_rate:.2f}, Pooled SD: {std_rate:.2f}")
-        f.write(f"\nMean rate end: {mean_rate_end:.2f}, Pooled SD end: {std_rate_end:.2f}")
-        f.close()
-
-    try:
-        for _i in range(5):
-
-            all_OD = list(optimalSol.keys())
-            all_OD = [OD for OD in all_OD if OD not in stochasticUE.od_with_no_assignments]
-
-            fig, axs = plt.subplots(4, 4, figsize=(15, 15))
-
-            for i, OD in enumerate(OD_sample):
-                row, col = divmod(i, 4)  
-
-                error = np.array(error_od[OD])  
-                iterations = np.arange(1, len(error) + 1)
-
-                nonzero_indices = error > 0
-                iterations = iterations[nonzero_indices]
-                error = error[nonzero_indices]
-
-                if len(iterations) > 2:
-                    # Compute empirical convergence rate |x_{i+1}| / |x_i|
-                    ratios = np.abs(error[1:] / error[:-1])
-
-                    num_points = max(1, len(ratios) // 4)
-                    ratios_subset = ratios[-num_points:]
-
-                    mean_ratio = np.mean(ratios_subset)
-
-                    # Plot in the corresponding subplot
-                    ax = axs[row, col]
-                    ax.plot(ratios, linestyle='-', label=r'$|c_{i+1}| / |c_i|$', linewidth=3)
-                    ax.axhline(y=mean_ratio, color='r', linestyle='--', label=f'Mean Rate: {mean_ratio:.2f}', linewidth=2)
-                    ax.set_xlabel('Iteration', fontsize=20)
-                    ax.set_ylabel('Convergence rate', fontsize=20)
-                    ax.set_title(f"OD: {OD}\nRate: {mean_ratio:.2f}", fontsize=22)
-                    ax.tick_params(axis='x', labelsize=20)
-                    ax.tick_params(axis='y', labelsize=20)
-                    # ax.grid(True)
-                    
-
-
-            plt.tight_layout()
-            plt.savefig(f'{folder}/Multiplots/ConvergenceRate_{_i}.pdf')
-            plt.close()
+    # 4. Save analysis data (CSV and TXT)
+    if convergence_rate:
+        df = pd.DataFrame(convergence_rate, index=['Mean', 'SD', 'Mean_end', 'SD_end']).T
+        df.to_csv(f'{folder}/ConvergenceRate.csv')
         
-        shutil.copy(f'{folder}/Multiplots/ConvergenceRate_{_i}.pdf', f'./Plots/paperPlots/{networkname}_ConvergenceRate_{_i}.pdf')
+        x_mean = [rate[0] for rate in convergence_rate.values()]
+        mean_rate = np.mean(x_mean)
+        std_rate = np.std(x_mean)
 
-    except ValueError:
-        pass
+        x_end = [rate[2] for rate in convergence_rate.values()]
+        mean_rate_end = np.mean(x_end)
+        std_rate_end = np.std(x_end)
+
+        print(f"Mean rate: {mean_rate:.2f}, SD: {std_rate:.2f}")
+        print(f"Mean rate end: {mean_rate_end:.2f}, SD end: {std_rate_end:.2f}")
+
+        with open(f'paperResults/{networkname}_{r}_ConvergenceRate.txt', 'w') as f:
+            f.write(f"Mean rate: {mean_rate:.2f}, Pooled SD: {std_rate:.2f}")
+            f.write(f"\nMean rate end: {mean_rate_end:.2f}, Pooled SD end: {std_rate_end:.2f}")
+
+    # 5. Plot Convergence Rate ONLY for the target_OD
+    if target_OD in error_od:
+        error = np.array(error_od[target_OD])  
+        iterations = np.arange(1, len(error) + 1)
+
+        nonzero_indices = error > 0
+        iterations = iterations[nonzero_indices]
+        error = error[nonzero_indices]
+
+        if len(iterations) > 2:
+            ratios = np.abs(error[1:] / error[:-1])
+            num_points = max(1, len(ratios) // 4)
+            ratios_subset = ratios[-num_points:]
+            mean_ratio_end_target = np.mean(ratios_subset)
+
+            plt.figure(figsize=(8, 6))
+            plt.plot(ratios, linestyle='-', label=r'$|c_{i+1}| / |c_i|$', linewidth=3)
+            plt.axhline(y=mean_ratio_end_target, color='r', linestyle='--', label=f'Mean Rate: {mean_ratio_end_target:.2f}', linewidth=2)
+            plt.xlabel('Iteration', fontsize=18)
+            plt.ylabel('Convergence rate', fontsize=18)
+            plt.title(f"OD: {target_OD}\nRate: {mean_ratio_end_target:.2f}", fontsize=18)
+            plt.xticks(fontsize=14)
+            plt.yticks(fontsize=14)
+            plt.legend(fontsize=14)
+            plt.tight_layout()
+            
+            plt.savefig(f'./Plots/paperPlots/{networkname}_ConvergenceRate_{target_OD}.pdf')
+            plt.close()
 
 def plotAll(stochasticUE, theta, optimalSol, optimalLinkFlows, ooptimalLinkCost, optimalTSTT, neworkname, r):
     """
@@ -559,7 +750,10 @@ def plotAll(stochasticUE, theta, optimalSol, optimalLinkFlows, ooptimalLinkCost,
     PlotTTBound(stochasticUE, ooptimalLinkCost, folder, neworkname)
     PlotTSTTBound(stochasticUE, optimalTSTT, folder, neworkname)
 
-    OD_sample = PlotBound(stochasticUE, optimalSol, folder, r, neworkname)
-    plotConvergence(stochasticUE, optimalSol, folder, r, neworkname, OD_sample)
+    valid_ods = [od for od in optimalSol.keys() if od not in stochasticUE.od_with_no_assignments]
+    target_OD = random.choice(valid_ods)
+
+    PlotBound(stochasticUE, optimalSol, folder, r, neworkname, target_OD)
+    plotConvergence(stochasticUE, optimalSol, folder, r, neworkname, target_OD)
 
     

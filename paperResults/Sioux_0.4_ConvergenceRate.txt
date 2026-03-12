@@ -1,0 +1,2 @@
+Mean rate: 1.05, Pooled SD: 1.47
+Mean rate end: 0.90, Pooled SD end: 0.03

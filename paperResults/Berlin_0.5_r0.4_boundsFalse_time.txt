@@ -1,0 +1,1 @@
+Average time spent on each iteration: 3.396220856764185 seconds
